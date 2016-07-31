@@ -8,7 +8,8 @@ module Gitsh
     end
 
     def initialized?
-      git_dir && File.exist?(git_dir)
+      dir = git_dir
+      dir && File.exist?(dir)
     end
 
     def git_dir
