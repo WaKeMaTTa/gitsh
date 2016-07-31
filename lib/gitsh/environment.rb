@@ -90,6 +90,10 @@ module Gitsh
       repo.has_modified_files?
     end
 
+    def repo_status
+      repo.status
+    end
+
     def repo_has_untracked_files?
       repo.has_untracked_files?
     end

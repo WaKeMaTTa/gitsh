@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 require 'gitsh/colors'
-require 'gitsh/prompt_color'
 
 module Gitsh
   class Prompter
@@ -11,11 +10,11 @@ module Gitsh
     def initialize(options={})
       @env = options.fetch(:env)
       @use_color = options.fetch(:color, true)
-      @prompt_color = options.fetch(:prompt_color) { PromptColor.new(@env) }
       @options = options
     end
 
     def prompt
+      reset_chached_repo_info
       padded_prompt_format.gsub(/%[bBcdDw#]/) do |match|
         case match
         when "%b" then branch_name
@@ -31,7 +30,13 @@ module Gitsh
 
     private
 
-    attr_reader :env, :prompt_color
+    attr_reader :env
+
+    def reset_chached_repo_info
+      @repo_initialized = nil
+      @branch_name = nil
+      @repo_status = nil
+    end
 
     def padded_prompt_format
       "#{prompt_format.chomp} "
@@ -54,7 +59,7 @@ module Gitsh
     end
 
     def branch_name
-      if env.repo_initialized?
+      @branch_name ||= if repo_initialized?
         env.repo_current_head
       else
         'uninitialized'
@@ -62,11 +67,11 @@ module Gitsh
     end
 
     def terminator
-      if !env.repo_initialized?
+      if !repo_initialized?
         '!!'
-      elsif env.repo_has_untracked_files?
+      elsif repo_status.has_untracked_files?
         '!'
-      elsif env.repo_has_modified_files?
+      elsif repo_status.has_modified_files?
         '&'
       else
         '@'
@@ -75,7 +80,15 @@ module Gitsh
 
     def status_color
       if use_color?
-        prompt_color.status_color
+        if !repo_initialized?
+          env.repo_config_color('gitsh.color.uninitialized', 'normal red')
+        elsif repo_status.has_untracked_files?
+          env.repo_config_color('gitsh.color.untracked', 'red')
+        elsif repo_status.has_modified_files?
+          env.repo_config_color('gitsh.color.modified', 'yellow')
+        else
+          env.repo_config_color('gitsh.color.default', 'blue')
+        end
       else
         Colors::NONE
       end
@@ -91,6 +104,17 @@ module Gitsh
 
     def use_color?
       @use_color
+    end
+
+    def repo_initialized?
+      if @repo_initialized.nil?
+        @repo_initialized = env.repo_initialized?
+      end
+      @repo_initialized
+    end
+
+    def repo_status
+      @repo_status ||= env.repo_status
     end
   end
 end

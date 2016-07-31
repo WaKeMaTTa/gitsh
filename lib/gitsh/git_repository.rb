@@ -21,11 +21,15 @@ module Gitsh
     end
 
     def has_untracked_files?
-      status.untracked_files.any?
+      status.has_untracked_files?
     end
 
     def has_modified_files?
-      status.modified_files.any?
+      status.has_modified_files?
+    end
+
+    def status
+      Status.new(git_output('status --porcelain'))
     end
 
     def heads
@@ -121,10 +125,6 @@ module Gitsh
       end
     end
 
-    def status
-      StatusParser.new(git_output('status --porcelain'))
-    end
-
     def git_output(command)
       Open3.capture3(git_command(command)).first.chomp
     end
@@ -133,17 +133,17 @@ module Gitsh
       "#{env.git_command(force_default)} #{sub_command}"
     end
 
-    class StatusParser
+    class Status
       def initialize(status_porcelain)
         @status_porcelain = status_porcelain
       end
 
-      def untracked_files
-        status_porcelain.lines.select { |l| l.start_with?('??') }
+      def has_untracked_files?
+        status_porcelain.lines.select { |l| l.start_with?('??') }.any?
       end
 
-      def modified_files
-        status_porcelain.lines.select { |l| l =~ /^ ?[A-Z]/ }
+      def has_modified_files?
+        status_porcelain.lines.select { |l| l =~ /^ ?[A-Z]/ }.any?
       end
 
       private
