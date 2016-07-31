@@ -16,15 +16,17 @@ module Gitsh
     end
 
     def prompt
-      padded_prompt_format.gsub(/%[bBcdDw#]/, {
-        '%b' => branch_name,
-        "%B" => shortened_branch_name,
-        '%c' => status_color,
-        '%d' => Dir.getwd,
-        '%D' => File.basename(Dir.getwd),
-        '%w' => clear_color,
-        '%#' => terminator
-      })
+      padded_prompt_format.gsub(/%[bBcdDw#]/) do |match|
+        case match
+        when "%b" then branch_name
+        when "%B" then shortened_branch_name
+        when "%c" then status_color
+        when "%d" then Dir.getwd
+        when "%D" then File.basename(Dir.getwd)
+        when "%w" then clear_color
+        when "%#" then terminator
+        end
+      end
     end
 
     private
