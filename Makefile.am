@@ -1,6 +1,19 @@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src man vendor spec ext/gitsh lib/gitsh
-EXTRA_DIST = LICENSE README.md INSTALL
+SUBDIRS = src lib/gitsh
+EXTRA_DIST = LICENSE README.md INSTALL vendor/vendorize
+
+nobase_dist_pkgdata_DATA = $(vendorfiles)
+distclean-local:
+	-rm -rf vendor/gems
+
+dist_man_MANS = man/man1/gitsh.1
+
+TESTS = $(testfiles)
+TEST_EXTENSIONS = .rb
+RB_LOG_COMPILER = bundle exec rspec
+AM_RB_LOG_FLAGS = -I $(abs_top_builddir)/spec -I $(abs_top_builddir)/lib
+
+# Release
 
 .PHONY: release \
 	release_build release_push release_clean \
