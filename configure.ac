@@ -45,7 +45,7 @@ cd "$current_dir"
 
 rubydir=$datadir/$PACKAGE/ruby
 pkgrubydir=$rubydir/$PACKAGE
-libfiles="$(cd "$(dirname "$0")/lib/gitsh"; echo $(find . -name \*.rb | cut -c 3-))"
+libfiles="$(echo $(find "$(dirname "$0")/lib/gitsh" -name \*.rb | cut -c 3-))"
 vendorfiles="$(echo $(find "$(dirname "$0")/vendor/gems" -type f))"
 testfiles="$(echo $(find "$(dirname "$0")/spec/integration" "$(dirname "$0")/spec/units" -type f -name \*rb))"
 gemsetuppath=$datadir/$PACKAGE/gems/setup.rb
@@ -58,5 +58,5 @@ AC_SUBST([vendorfiles])
 AC_SUBST([testfiles])
 AC_SUBST([gemsetuppath])
 
-AC_CONFIG_FILES([Makefile src/Makefile lib/gitsh/Makefile INSTALL])
+AC_CONFIG_FILES([Makefile INSTALL])
 AC_OUTPUT

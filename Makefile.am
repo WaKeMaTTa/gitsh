@@ -1,10 +1,49 @@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src lib/gitsh
-EXTRA_DIST = LICENSE README.md INSTALL vendor/vendorize
+EXTRA_DIST = \
+						 LICENSE \
+						 README.md \
+						 INSTALL \
+						 vendor/vendorize \
+						 ext/gitsh/extconf.rb \
+						 ext/gitsh/src/line_editor.c \
+						 src/gitsh.rb.in \
+						 lib/gitsh/version.rb.in
+
+bin_PROGRAMS = gitsh
+gitsh_SOURCES = src/gitsh.c
+AM_CPPFLAGS = -DGITSH_RB_PATH="\"$(rubydir)/$(PACKAGE).rb\""
+
+ruby_SCRIPTS = src/gitsh.rb
+CLEANFILES = $(ruby_SCRIPTS) lib/gitsh/version.rb
+
+edit = sed \
+	-e 's|@RUBY[@]|$(RUBY)|g' \
+	-e 's|@rubydir[@]|$(rubydir)|g' \
+	-e 's|@gemsetuppath[@]|$(gemsetuppath)|g'
+
+src/gitsh.rb: Makefile src/gitsh.rb.in
+	$(edit) $(srcdir)/$@.in > $@
+	chmod +x $@
+
+pkgruby_DATA = lib/gitsh/version.rb
+nobase_dist_pkgruby_DATA = $(libfiles)
+
+replace_version = sed \
+	-e 's|@PACKAGE_VERSION[@]|$(PACKAGE_VERSION)|g'
+
+lib/gitsh/version.rb: Makefile lib/gitsh/version.rb.in
+	$(replace_version) $(srcdir)/$@.in > $@
+
+all-local: 
+	cd ext/gitsh && $(MAKE)
+
+clean-local:
+	cd ext/gitsh && $(MAKE) clean
 
 nobase_dist_pkgdata_DATA = $(vendorfiles)
 distclean-local:
-	-rm -rf vendor/gems
+	rm -rf vendor/gems
+	rm -f ext/gitsh/Makefile
 
 dist_man_MANS = man/man1/gitsh.1
 
