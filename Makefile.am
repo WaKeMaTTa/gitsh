@@ -1,13 +1,13 @@
 AUTOMAKE_OPTIONS = foreign
 EXTRA_DIST = \
-						 LICENSE \
-						 README.md \
-						 INSTALL \
-						 vendor/vendorize \
-						 ext/gitsh/extconf.rb \
-						 ext/gitsh/src/line_editor.c \
-						 src/gitsh.rb.in \
-						 lib/gitsh/version.rb.in
+	LICENSE \
+	README.md \
+	INSTALL \
+	vendor/vendorize \
+	ext/gitsh/extconf.rb \
+	ext/gitsh/src/line_editor.c \
+	src/gitsh.rb.in \
+	lib/gitsh/version.rb.in
 
 bin_PROGRAMS = gitsh
 gitsh_SOURCES = src/gitsh.c
